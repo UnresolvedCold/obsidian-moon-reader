@@ -8,11 +8,13 @@ import { ColorPicker } from 'src/colorpicker';
 export interface MoonReaderSettings {
 	exportsPath: string;
 	enableSRSSupport: boolean;
+	outputNotesPath?: string; // New: directory for exported notes
 }
 
 const MOONREADER_DEFAULT_SETTINGS: MoonReaderSettings = {
 	exportsPath: 'Book Exports',
-	enableSRSSupport: false
+	enableSRSSupport: false,
+	outputNotesPath: 'MoonReader Exports' // Default output directory
 }
 
 export default class MoonReader extends Plugin {
@@ -77,7 +79,28 @@ export default class MoonReader extends Plugin {
 			const output = colorChoice === -1
 				? generateOutput(parsedOutput, mrexptChoice, null, this.settings.enableSRSSupport)
 				: generateOutput(parsedOutput, mrexptChoice, colorChoice, this.settings.enableSRSSupport);
-			await this.app.vault.append(currentTFile, output);
+
+			// New logic: export to a new file in outputNotesPath
+			const outputDir = this.settings.outputNotesPath || 'MoonReader Exports';
+			const { bookName } = parsedOutput[0];
+			const safeBookName = bookName.replace(/[/\\?%*:|"<>]/g, "_");
+			const fileName = `${safeBookName}.md`;
+			const fullPath = `${outputDir}/${fileName}`;
+
+			// Ensure directory exists
+			let outputFolder = this.app.vault.getAbstractFileByPath(outputDir);
+			if (!outputFolder) {
+				await this.app.vault.createFolder(outputDir);
+			}
+
+			// Create or overwrite the file
+			let outputFile = this.app.vault.getAbstractFileByPath(fullPath);
+			if (outputFile) {
+				await this.app.vault.modify(outputFile, output);
+			} else {
+				await this.app.vault.create(fullPath, output);
+			}
+			new Notice(`Exported to ${fullPath}`);
 		} else {
 			new Notice("Nothing added!");
 		}

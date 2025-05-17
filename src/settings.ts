@@ -49,6 +49,18 @@ export class SettingsTab extends PluginSettingTab {
 					this.plugin.settings.exportsPath = value;
 					await this.plugin.saveSettings();
 				}));
+
+		new Setting(containerEl)
+			.setName('Exported Notes Path')
+			.setDesc('Directory where exported notes will be saved. If it does not exist, it will be created.')
+			.addText(text => text
+				.setPlaceholder('MoonReader Exports')
+				.setValue(this.plugin.settings.outputNotesPath || '')
+				.onChange(async (value) => {
+					this.plugin.settings.outputNotesPath = value;
+					await this.plugin.saveSettings();
+				})
+			);
 	}
 
 	async updateSettings(settings: Partial<MoonReaderSettings>) {
