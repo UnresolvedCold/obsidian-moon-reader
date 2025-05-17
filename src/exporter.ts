@@ -2,7 +2,7 @@ import {Annotation} from 'src/types';
 import {TFile} from 'obsidian';
 import integerToRGBA from "./util";
 
-export function generateOutput(listOfAnnotations: Annotation[], mrexptTFile: TFile, colorFilter: number, enableNewExporter: boolean): string {
+export function generateOutput(listOfAnnotations: Annotation[], mrexptTFile: TFile, colorFilter: number|null, enableNewExporter: boolean): string {
     const sample = listOfAnnotations[0];
     //TODO: extract into template
     // TODO: last exported ID is likely broken
@@ -18,7 +18,11 @@ tags:
 
 `;
 
-    for (const annotation of listOfAnnotations.filter(t=>t.signedColor == colorFilter)) {
+    const filteredAnnotations = colorFilter == null
+        ? listOfAnnotations
+        : listOfAnnotations.filter(t => t.signedColor == colorFilter);
+
+    for (const annotation of filteredAnnotations) {
         let annotationAsString: string;
         if (annotation.highlightText) {
             annotationAsString = `${template(annotation, enableNewExporter)}\n`;

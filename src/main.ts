@@ -69,10 +69,15 @@ export default class MoonReader extends Plugin {
 		if (parsedOutput) {
 			const colorChoices = new Set<number>();
 			parsedOutput.forEach(t => colorChoices.add(t.signedColor))
-			const colorModal = new ColorPicker(this.app, Array.from(colorChoices));
+			const colorChoicesArr = Array.from(colorChoices);
+			colorChoicesArr.unshift(-1); // -1 for All colors
+			const colorModal = new ColorPicker(this.app, colorChoicesArr);
 			const colorChoice = await colorModal.openAndGetValue()
 			// .catch(e=>console.log(e));
-			await this.app.vault.append(currentTFile, generateOutput(parsedOutput, mrexptChoice, colorChoice, this.settings.enableSRSSupport));
+			const output = colorChoice === -1
+				? generateOutput(parsedOutput, mrexptChoice, null, this.settings.enableSRSSupport)
+				: generateOutput(parsedOutput, mrexptChoice, colorChoice, this.settings.enableSRSSupport);
+			await this.app.vault.append(currentTFile, output);
 		} else {
 			new Notice("Nothing added!");
 		}

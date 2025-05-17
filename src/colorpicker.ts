@@ -20,6 +20,7 @@ export class ColorPicker extends FuzzySuggestModal<number> {
 	}
 
 	getItemText(item: number): string {
+		if (item === -1) return "All colors";
 		return `${integerToRGBA(item)}`;
 	}
 
@@ -57,6 +58,11 @@ export class ColorPicker extends FuzzySuggestModal<number> {
 	
 	renderSuggestion(item: FuzzyMatch<number>, el: HTMLElement): void {
 		el.addClass("colorpicker");
+		if (item.item === -1) {
+			const div = el.createDiv();
+			div.setText("All colors");
+			return;
+		}
 		const colorDiv = el.createDiv("color-box");
 		colorDiv.style.backgroundColor = `#${integerToRGBA(item.item).slice(0,6)}`;
 		const div = el.createDiv();
