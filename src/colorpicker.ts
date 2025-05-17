@@ -59,6 +59,16 @@ export class ColorPicker extends FuzzySuggestModal<number> {
 	renderSuggestion(item: FuzzyMatch<number>, el: HTMLElement): void {
 		el.addClass("colorpicker");
 		if (item.item === -1) {
+			const grid = el.createDiv({ cls: "color-grid" });
+			const gridColors = [
+				"#FF5252", "#FFD600", "#69F0AE",
+				"#40C4FF", "#B388FF", "#FF4081",
+				"#FFAB40", "#8D6E63", "#607D8B"
+			];
+			for (let i = 0; i < 9; i++) {
+				const cell = grid.createDiv({ cls: "color-grid-cell" });
+				cell.style.backgroundColor = gridColors[i];
+			}
 			const div = el.createDiv();
 			div.setText("All colors");
 			return;
